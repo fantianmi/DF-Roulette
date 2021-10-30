@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="/images/logo.png" type="image/x-icon">
+    <link rel="icon" href="/images/logo.png" type="image/x-icon">
+    <title>轮盘小游戏</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/main.css" rel="stylesheet">
+  </head>
+  <body>
+    <style>
+      body{background-image: url('images/roulette-slice.png');}
+
+      body {}
+      h1{color:#FFF;font-weight: bold;font-size: 26px;text-shadow: 5px 5px 5px #222222;}
+      .rule .rule-text{
+        background-color: #075600;
+        background-image: url(images/thumbs-bg.png);
+        background-repeat: repeat;
+        border: 3px solid #eee;
+        border-radius: 14px;
+        padding: 7px 15px;
+        text-shadow: 1px 1px 1px #333;
+      }
+      .rule .rule-text p{color:#fff;font-weight:bold;text-shadow: 1px 1px 1px #333;text-align: left;}
+      .rule .rule-text p br{margin-bottom:10px;}
+      .connect-wallet-btn{background-color: #000;font-weight: bold; margin: 10px auto;border:3px solid #eee;}
+      .wheel-box{
+        border: 3px solid #eee;
+        border-radius: 14px;
+        padding: 7px 15px;
+        background-color: #222;
+      }
+      .bet-table{
+        border: 3px solid #eee;
+        border-radius: 14px;
+        padding: 7px 15px;
+        margin:0;
+        background-color: #026654;
+        margin-bottom:30px;
+        min-height: 500px;
+      }
+      .bet-table p{color:#fff;font-size: 15px;}
+      #betsList li{list-style: none;color: #fff;background-color: #222;padding:5px;border-radius: 6px;float:left;margin-right: 10px;margin-bottom:5px;}
+      .spinWheel{padding:30px;}
+      .spinWheel button{font-weight: bold;}
+    </style>
+    <p id="warning"></p>
+    <div class="container">
+      <div class="row rule">
+        <div class="col-xs-12 text-center">
+          <h1>轮盘游戏</h1>
+          <div class="rule-text">
+            <p>要玩轮盘游戏，请先在下方桌面下注，下注方式有以下几种: <br>
+              0: 颜色（猜黑红）- 赢 2x<br>
+              1: 猜列数 - 赢 3x<br>
+              2: dozen - 赢 3x<br>
+              3: eighteen - 赢 2x<br>
+              4: 猜被三整除 - 赢 2x<br>
+              5: 猜数字 - 赢 36x
+              <br><br></p>
+              <p>下注完成后，点击“转动轮盘”摇奖</p>
+          </div>
+          <p id="errorPanel" style="color:red">&nbsp;</p>
+          <br/>
+        </div>
+      </div>
+      <div class="row" id="approveContract" style="visibility: hidden;">
+        <div class="col-xs-12 text-center">
+          <button class="btn btn-primary connect-wallet-btn btn-lg" onclick="approveContract()">Approve</button>
+        </div>
+      </div>
+      <div class="row" id="notConnected">
+        <div class="col-sm-12  text-center">
+          <button class="btn btn-primary connect-wallet-btn btn-lg" onclick="connectWallet()">连接钱包</button>
+        </div>
+      </div>
+      <div id="connected">
+        <h1 style="font-size: 18px;">第一步：下注</h1>
+        <div class="row bet-table">
+          <div class="col-md-6">
+            <p><strong>用户信息</strong></p>
+            <p>参与地址: <span id="yourAddress"></span></p>
+            <p>奖池: <span id="balance"></span>DF</p>
+            <p style="display: none;">余额: <span id="yourBalance"></span></p>
+            <p>
+              待领取奖金: <span id="winnings"></span>DF
+              <button class="cashout btn btn-xs btn-primary" onclick="cashOut()">提到钱包</button>
+            </p>
+            <p>下注总数: <span id="betsCount"></span></p>
+            <p>下注总量: <span id="betsValue"></span>DF</p>
+            <p>下次开始时间: <span id="timeUntilNextSpin"></span>s</p>
+          </div>
+          <div class="col-md-6">
+            <p>请在下方下注:<p>
+            <img id="layout" src="images/layout.png" usemap="#mapname"/>
+            <map id="rouletteTable" name="mapname">
+              <area id="n00" shape="rect" coords="  7, 13, 40,149"> <!-- numbers (37) -->
+              <area id="n01" shape="rect" coords=" 40,104, 70,148">
+              <area id="n02" shape="rect" coords=" 40, 60, 70,104">
+              <area id="n03" shape="rect" coords=" 40, 16, 70, 60">
+              <area id="n04" shape="rect" coords=" 70,104,100,148">
+              <area id="n05" shape="rect" coords=" 70, 60,100,104">
+              <area id="n06" shape="rect" coords=" 70, 16,100, 60">
+              <area id="n07" shape="rect" coords="100,104,130,148">
+              <area id="n08" shape="rect" coords="100, 60,130,104">
+              <area id="n09" shape="rect" coords="100, 16,130, 60">
+              <area id="n10" shape="rect" coords="130,104,160,148">
+              <area id="n11" shape="rect" coords="130, 60,160,104">
+              <area id="n12" shape="rect" coords="130, 16,160, 60">
+              <area id="n13" shape="rect" coords="160,104,190,148">
+              <area id="n14" shape="rect" coords="160, 60,190,104">
+              <area id="n15" shape="rect" coords="160, 16,190, 60">
+              <area id="n16" shape="rect" coords="190,104,220,148">
+              <area id="n17" shape="rect" coords="190, 60,220,104">
+              <area id="n18" shape="rect" coords="190, 16,220, 60">
+              <area id="n19" shape="rect" coords="220,104,250,148">
+              <area id="n20" shape="rect" coords="220, 60,250,104">
+              <area id="n21" shape="rect" coords="220, 16,250, 60">
+              <area id="n22" shape="rect" coords="250,104,280,148">
+              <area id="n23" shape="rect" coords="250, 60,280,104">
+              <area id="n24" shape="rect" coords="250, 16,280, 60">
+              <area id="n25" shape="rect" coords="280,104,310,148">
+              <area id="n26" shape="rect" coords="280, 60,310,104">
+              <area id="n27" shape="rect" coords="280, 16,310, 60">
+              <area id="n28" shape="rect" coords="310,104,340,148">
+              <area id="n29" shape="rect" coords="310, 60,340,104">
+              <area id="n30" shape="rect" coords="310, 16,340, 60">
+              <area id="n31" shape="rect" coords="340,104,370,148">
+              <area id="n32" shape="rect" coords="340, 60,370,104">
+              <area id="n33" shape="rect" coords="340, 16,370, 60">
+              <area id="n34" shape="rect" coords="370,104,400,148">
+              <area id="n35" shape="rect" coords="370, 60,400,104">
+              <area id="n36" shape="rect" coords="370, 16,400, 60">
+              <area id="c_1" shape="rect" coords="160,181,220,213"> <!-- colors (2) -->
+              <area id="c_0" shape="rect" coords="220,181,280,213">
+              <area id="d_0" shape="rect" coords=" 40,148,160,181"> <!-- dozens (3) -->
+              <area id="d_1" shape="rect" coords="160,148,280,181">
+              <area id="d_2" shape="rect" coords="280,148,400,181">
+              <area id="e_0" shape="rect" coords=" 40,181,100,213"> <!-- eighteens (2) -->
+              <area id="e_1" shape="rect" coords="340,181,400,213">
+              <area id="m_0" shape="rect" coords="100,181,160,213"> <!-- modulus (2) -->
+              <area id="m_1" shape="rect" coords="280,181,340,213">
+              <area id="p_0" shape="rect" coords="400,104,430,148"> <!-- pilar/columns (3) -->
+              <area id="p_1" shape="rect" coords="400, 60,430,104">
+              <area id="p_2" shape="rect" coords="400, 16,430, 60">
+            </map>
+            <p><strong>已下注:</strong></p>
+            <div id="betsList"></div>
+          </div>
+         
+        </div>
+        <div class="row" style="margin:0;">
+          <div class="col-xs-12 text-center spinWheel">
+            <button onclick="spinWheel()" class="btn btn-lg btn-danger" id="spinWheelText">转动轮盘</button>
+          </div>
+        </div>
+        <div class="row" style="margin:0;">
+          
+          <div class="col-sm-6 text-center wheel-box col-sm-push-3">
+            <p><img src="images/arrow-down.png" style="width: 15px;"><p>
+            <img id="wheel" src="images/wheel.png" />
+            <br /><br />
+            
+          </div>
+        </div>
+        
+      </div>
+      
+      
+      
+      <div style="clear:both"></div>
+      <div style="height: 50px; display: block;"></div>
+    </div>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/web3.min.js"></script>
+    <script src="js/truffle-contract.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>
